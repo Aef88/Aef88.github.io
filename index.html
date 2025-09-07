@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>QC Data Management - All Pages</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background: rgb(205, 221, 236); }
+    .navbar-custom {
+      background: #1976d2;
+      color: #fff;
+      height: 80px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+      z-index: 10;
+    }
+    .navbar-custom .navbar-brand {
+      font-family: 'Poppins', sans-serif;
+      color: #fff !important;
+      font-size: 30px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-left: 12px;
+    }
+    .dashboard-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+      padding: 15px 25px;
+      border-radius: 10px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+      letter-spacing: 0.5px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    .widgets-row {
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .widget {
+      background: #f2f8ff;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.09);
+      border-radius: 10px;
+      flex: 1 1 200px;
+      min-width: 210px;
+      max-width: 300px;
+      padding: 24px 20px 18px 24px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .widget .label { color: #4b5e78; font-size: 15px; margin-bottom: 10px; font-weight: 500; }
+    .widget .value { font-size: 2.1em; color: #1976d2; font-weight: bold; margin-bottom: 4px; }
+    .widget .icon { position: absolute; top: 18px; right: 18px; font-size: 2em; opacity: 0.10; pointer-events: none; }
+    .widget.widget-green .value { color: #38a169; }
+    .widget.widget-yellow .value { color: #eab308; }
+    .widget.widget-red .value { color: #e53e3e; }
+    .widget.widget-green { background: #f3fdf7; }
+    .widget.widget-yellow { background: #fdfbe7; }
+    .widget.widget-red { background: #fff4f4; }
+    .stat-table th { background: #f8fbff; color: #1976d2; font-weight: bold; }
+    @media (max-width: 991.98px) {
+      .widgets-row { flex-direction: column; gap: 12px; }
+      .widget { min-width: 90%; }
+    }
+    .chart-container { position: relative; height: 360px; width: 100%; }
+    .card-body canvas { width: 100% !important; height: 100% !important; background: transparent !important; display: block; }
+    .nav-tabs .nav-link.active { background: #1976d2; color: #fff; }
+    .nav-tabs .nav-link { color: #1976d2; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+    <div class="container-fluid">
+      <img src="logo_bfi.png" alt="Logo Perusahaan" style="height:40px; margin-right:18px; vertical-align:middle;">
+      <span class="navbar-brand">Data Quality Control PT.Blasfolie Internasional Indonesia (BFI)</span>
+      <div class="d-flex ms-auto">
+        <a href="#" class="btn btn-light btn-sm me-2 active" onclick="showTab('dashboard')"><i class="bi bi-house-door"></i> Dashboard</a>
+        <a href="#" class="btn btn-outline-light btn-sm me-2" onclick="showTab('pengecekan')"><i class="bi bi-clipboard-data"></i> Data Pengecekan</a>
+        <a href="#" class="btn btn-outline-light btn-sm me-2" onclick="showTab('produk')"><i class="bi bi-box-seam"></i> Data Produk</a>
+        <a href="#" class="btn btn-outline-light btn-sm me-2" onclick="showTab('dpts')"><i class="bi bi-exclamation-triangle"></i> Data DPTS</a>
+        <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="bi bi-exclamation-triangle"></i> COC Amcor</a>
+        <a href="#" class="btn btn-danger btn-sm"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        <a href="#" class="d-flex align-items-center text-decoration-none" aria-expanded="false">
+          <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/eeaaf6d3-3539-4bd5-b340-1f2086d8f65e.png" alt="User profile" width="40" height="40" class="rounded-circle me-2">
+          <strong class="text-white fw-bold fs-5">User</strong>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="container-fluid" style="padding-top:100px;">
+    <!-- Tabs Navigation -->
+   <!-- <ul class="nav nav-tabs mb-4" id="mainTabs">
+      <li class="nav-item"><a class="nav-link active" href="#" onclick="showTab('dashboard')">Dashboard</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showTab('pengecekan')">Data Pengecekan</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showTab('produk')">Data Produk</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showTab('dpts')">Data DPTS</a></li>
+    </ul>
+    <!-- Dashboard Tab -->
+    <div id="dashboardTab">
+      <div class="card mb-4">
+        <h2 class="dashboard-title">Dashboard</h2>
+      </div>
+      <div class="widgets-row">
+        <div class="widget">
+          <div class="label">Total Produk</div>
+          <div class="value" id="produkTotal">12</div>
+          <div class="icon"><i class="bi bi-bar-chart-line"></i></div>
+        </div>
+        <div class="widget widget-green">
+          <div class="label">Total Data Pengecekan</div>
+          <div class="value" id="pengecekanTotal">34</div>
+          <div class="icon"><i class="bi bi-clipboard-data"></i></div>
+        </div>
+        <div class="widget widget-yellow">
+          <div class="label">Total DPTS</div>
+          <div class="value" id="dptsTotal">7</div>
+          <div class="icon"><i class="bi bi-gear"></i></div>
+        </div>
+        <div class="widget widget-red">
+          <div class="label">Produk OK</div>
+          <div class="value" id="produkOK">30</div>
+          <div class="icon"><i class="bi bi-check-circle"></i></div>
+        </div>
+        <div class="widget widget-green">
+          <div class="label">Produk Hold</div>
+          <div class="value" id="produkHold">4</div>
+          <div class="icon"><i class="bi bi-pause-circle"></i></div>
+        </div>
+      </div>
+      <div class="card mb-4">
+        <form class="row g-3 align-items-end" method="get" action="">
+          <div class="col-md-3">
+            <label class="form-label">Tahun</label>
+            <select class="form-select" name="tahun" id="tahun" onchange="setTahun(this.value)">
+              <option value="">- Semua Tahun -</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Dari Tanggal</label>
+            <input type="date" class="form-control" name="tgl_awal" id="tgl_awal">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Sampai Tanggal</label>
+            <input type="date" class="form-control" name="tgl_akhir" id="tgl_akhir">
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filter</button>
+          </div>
+        </form>
+        <script>
+          function setTahun(val) {
+            if(val) {
+              document.getElementById('tgl_awal').value = val + '-01-01';
+              document.getElementById('tgl_akhir').value = val + '-12-31';
+            }
+          }
+        </script>
+      </div>
+      <div class="row mt-4">
+        <div class="col-lg-6 mb-4">
+          <div class="card h-100">
+            <h3 class="card-title">Statistik DPTS per Problem</h3>
+            <div class="card-body">
+              <table class="stat-table table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>Problem</th>
+                    <th>Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Contoh Problem 1</td><td>5</td></tr>
+                  <tr><td>Contoh Problem 2</td><td>2</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+          <div class="card h-100">
+            <h3 class="card-title">Pareto Chart DPTS per Problem</h3>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="paretoChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-lg-7 mb-4">
+          <div class="card h-100">
+            <h3 class="card-title">Diagram Batang DPTS per Bagian Penyebab</h3>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="batangBagianPenyebab"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Data Pengecekan Tab -->
+    <div id="pengecekanTab" style="display:none;">
+      <div class="card mb-4">
+        <h2 class="dashboard-title">Tambah Data Pengecekan</h2>
+      </div>
+      <form>
+        <div class="row mb-3">
+          <div class="col-md-3"><label>Tanggal</label><input type="date" class="form-control"></div>
+          <div class="col-md-3"><label>Tanggal Pengiriman</label><input type="date" class="form-control"></div>
+          <div class="col-md-3"><label>No WO</label><select class="form-select"><option>-- Pilih No WO--</option></select></div>
+          <div class="col-md-3"><label>Product Code/Type</label><input type="text" class="form-control"></div>
+          <div class="col-md-3"><label>Customer Name</label><input type="text" class="form-control"></div>
+          <div class="col-md-3"><label>Lot No</label><input type="text" class="form-control"></div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-2"><label>Width Std</label><input type="number" class="form-control"></div>
+          <div class="col-md-2"><label>Width Actual</label><input type="number" class="form-control"></div>
+          <div class="col-md-2"><label>Length Std</label><input type="number" class="form-control"></div>
+          <div class="col-md-2"><label>Thickness Standar</label><input type="number" class="form-control"></div>
+          <div class="col-md-2"><label>Std_Gram</label><input type="number" class="form-control"></div>
+          <div class="col-md-2"><label>Weight Per Roll</label><input type="number" class="form-control"></div>
+        </div>
+        <!-- TABEL THICKNESS -->
+        <div class="table-responsive mb-3">
+          <label class="form-label fw-bold">Input Thickness (μm)</label>
+          <table class="table table-bordered table-sm align-middle table-input">
+            <thead class="table-light">
+              <tr>
+                <th>T1</th><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>T8</th><th>T9</th><th>T10</th>
+                <th>T11</th><th>T12</th><th>T13</th><th>T14</th><th>T15</th><th>T16</th><th>T17</th><th>T18</th><th>T19</th><th>T20</th>
+                <th>T21</th><th>T22</th><th>T23</th><th>T24</th><th>T25</th><th>T26</th><th>T27</th><th>T28</th><th>T29</th><th>T30</th>
+                <th>Min</th><th>Max</th><th>Avg</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <!-- 30 input thickness -->
+                <td><input type="number" class="form-control"></td>
+                <!-- ...repeat for T2-T30... -->
+                <td><input type="number" class="form-control"></td>
+                <!-- ... -->
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- TABEL GRAMMAGE -->
+        <div class="table-responsive mb-3">
+          <label class="form-label fw-bold">Input Grammage (g/m²)</label>
+          <table class="table table-bordered table-sm align-middle table-input">
+            <thead class="table-light">
+              <tr>
+                <th>L</th><th>C</th><th>R</th><th>Min</th><th>Max</th><th>Avg</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- TABEL PARAMETER LAINNYA -->
+        <div class="table-responsive mb-3">
+          <label class="form-label fw-bold">Parameter Lainnya</label>
+          <table class="table table-bordered table-sm align-middle table-input">
+            <thead class="table-light">
+              <tr>
+                <th>Treatment Inside Roll</th>
+                <th>Treatment Outside Roll</th>
+                <th>COF Min</th>
+                <th>COF Avg</th>
+                <th>COF Max</th>
+                <th>Whiteness</th>
+                <th>Joint</th>
+                <th>Opacity</th>
+                <th>Appearance</th>
+                <th>Watt Corona</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- TABEL MEKANIKAL -->
+        <div class="table-responsive mb-3">
+          <label class="form-label fw-bold">Parameter Mekanikal</label>
+          <table class="table table-bordered table-sm align-middle table-input">
+            <thead class="table-light">
+              <tr>
+                <th>Seal Strength MD</th>
+                <th>Seal Strength TD</th>
+                <th>Tensile MD</th>
+                <th>Tensile TD</th>
+                <th>Elongation MD</th>
+                <th>Elongation TD</th>
+                <th>Output Kg/H</th>
+                <th>Speed m/min</th>
+                <th>Duration (minute)</th>
+                <th>Profile 2Sigma</th>
+                <th>Status</th>
+                <th>Masalah</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="number" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+                <td><input type="text" class="form-control"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-3">
+          <button class="btn btn-success" type="submit"><i class="bi bi-save"></i> Simpan</button>
+          <a href="#" class="btn btn-link">Batal</a>
+        </div>
+      </form>
+    </div>
+    <!-- Data Produk Tab -->
+    <div id="produkTab" style="display:none;">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="dashboard-title">Data Produk</h2>
+        <a href="#" class="btn btn-success"><i class="bi bi-plus-circle"></i> Tambah Data</a>
+      </div>
+      <form>
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>NO WO</th>
+              <th>SPK</th>
+              <th>Product Code/Type</th>
+              <th>Customer Name</th>
+              <th>Thickness</th>
+              <th>Width</th>
+              <th>Length</th>
+              <th>Aksi</th>
+            </tr>
+            <tr>
+              <th><input type="text" class="form-control form-control-sm"></th>
+              <th><input type="text" class="form-control form-control-sm"></th>
+              <th><input type="text" class="form-control form-control-sm"></th>
+              <th><input type="text" class="form-control form-control-sm"></th>
+              <th><input type="text" class="form-control form-control-sm"></th>
+              <th><input type="text" class="form-control form-control-sm"></th>
+              <th><input type="text" class="form-control form-control-sm"></th>
+              <th>
+                <button type="submit" class="btn btn-secondary btn-sm"><i class="bi bi-search"></i> Cari</button>
+                <a href="#" class="btn btn-link btn-sm">Reset</a>
+              </th>
+            </tr>
+          </thead>
+        </table>
+      </form>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle table-sm w-100">
+          <thead class="table-light">
+            <tr>
+              <th>No</th>
+              <th>NO WO</th>
+              <th>SPK</th>
+              <th>Product Code/Type</th>
+              <th>Customer Name</th>
+              <th>Thickness</th>
+              <th>Width</th>
+              <th>Length</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="9" class="text-center text-muted" style="height:80px;">
+                <i class="bi bi-info-circle"></i> Tidak ada data produk. Silakan tambah data baru.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Data DPTS Tab -->
+    <div id="dptsTab" style="display:none;">
+      <h3 class="dashboard-title">Tambah Data DPTS</h3>
+      <form class="row row-cols-1 row-cols-md-4 g-3 mb-4">
+        <div class="col"><label>Tgl DPTS</label><input type="date" class="form-control form-control-sm"></div>
+        <div class="col"><label>Customer Name</label><input type="text" class="form-control form-control-sm"></div>
+        <div class="col"><label>NO WO</label><input type="text" class="form-control form-control-sm"></div>
+        <div class="col"><label>Product Code/Type</label><input type="text" class="form-control form-control-sm"></div>
+        <div class="col"><label>Thickness</label><input type="number" class="form-control form-control-sm"></div>
+        <div class="col"><label>Width</label><input type="number" class="form-control form-control-sm"></div>
+        <div class="col"><label>Length</label><input type="number" class="form-control form-control-sm"></div>
+        <div class="col"><label>Problem</label><input type="text" class="form-control form-control-sm"></div>
+        <div class="col"><label>Quantity (Meter)</label><input type="number" class="form-control form-control-sm"></div>
+        <div class="col"><label>Status</label><input type="text" class="form-control form-control-sm"></div>
+        <div class="col"><label>Hasil Periksa</label><input type="text" class="form-control form-control-sm"></div>
+        <div class="col"><label>Tanggal Perbaikan</label><input type="date" class="form-control form-control-sm"></div>
+        <div class="col"><label>Keputusan</label><input type="text" class="form-control form-control-sm"></div>
+        <div class="col"><label>Keterangan Keputusan</label><input type="text" class="form-control form-control-sm"></div>
+        <div class="col"><label>Penemu</label><input type="text" class="form-control form-control-sm"></div>
+        <div class="col"><label>Bagian Penyebab</label><input type="text" class="form-control form-control-sm"></div>
+        <div class="col"><label>Quantity OK (Meter)</label><input type="number" class="form-control form-control-sm"></div>
+        <div class="col-12">
+          <button class="btn btn-success mt-2" type="submit"><i class="bi bi-save"></i> Simpan</button>
+        </div>
+      </form>
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h3 class="mb-3">Data DPTS</h3>
+          <form>
+            <table class="table table-bordered table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>NO WO</th>
+                  <th>Product Code/Type</th>
+                  <th>Customer Name</th>
+                  <th>Thickness</th>
+                  <th>Width</th>
+                  <th>Length</th>
+                  <th>Aksi</th>
+                </tr>
+                <tr>
+                  <th><input type="text" class="form-control form-control-sm"></th>
+                  <th><input type="text" class="form-control form-control-sm"></th>
+                  <th><input type="text" class="form-control form-control-sm"></th>
+                  <th><input type="text" class="form-control form-control-sm"></th>
+                  <th><input type="text" class="form-control form-control-sm"></th>
+                  <th><input type="text" class="form-control form-control-sm"></th>
+                  <th>
+                    <button type="submit" class="btn btn-secondary btn-sm"><i class="bi bi-search"></i> Cari</button>
+                    <a href="#" class="btn btn-link btn-sm">Reset</a>
+                  </th>
+                </tr>
+              </thead>
+            </table>
+          </form>
+          <div class="table-responsive" style="min-width:100vw;">
+            <table class="table table-bordered table-hover align-middle table-sm w-100">
+              <thead class="table-light">
+                <tr>
+                  <th>No</th>
+                  <th>Tgl DPTS</th>
+                  <th>Customer Name</th>
+                  <th>No WO</th>
+                  <th>Product Code/Type</th>
+                  <th>Thickness</th>
+                  <th>Width</th>
+                  <th>Length</th>
+                  <th>Problem</th>
+                  <th>Quantity (Meter)</th>
+                  <th>Status</th>
+                  <th>Hasil Periksa</th>
+                  <th>Tanggal Perbaikan</th>
+                  <th>Keputusan</th>
+                  <th>Keterangan Keputusan</th>
+                  <th>Penemu</th>
+                  <th>Bagian Penyebab</th>
+                  <th>Quantity OK (Meter)</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="19" class="text-center text-danger">Data tidak ditemukan.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <nav>
+            <ul class="pagination justify-content-center mt-3">
+              <li class="page-item disabled"><span class="page-link">Previous</span></li>
+              <li class="page-item active"><span class="page-link">1</span></li>
+              <li class="page-item disabled"><span class="page-link">Next</span></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Dummy data for frontend demo
+    const paretoLabels = ['Problem 1', 'Problem 2', 'Problem 3'];
+    const paretoValues = [5, 2, 1];
+    let total = paretoValues.reduce((a,b)=>a+b,0);
+    let cumulative = [];
+    let sum = 0;
+    for(let i=0;i<paretoValues.length;i++) {
+      sum += paretoValues[i];
+      cumulative.push(total > 0 ? Math.round(sum/total*100) : 0);
+    }
+    new Chart(document.getElementById('paretoChart'), {
+      type: 'bar',
+      data: {
+        labels: paretoLabels,
+        datasets: [{
+          label: 'Jumlah',
+          data: paretoValues,
+          backgroundColor: '#1976d2',
+          yAxisID: 'y',
+        },{
+          label: 'Kumulatif (%)',
+          data: cumulative,
+          type: 'line',
+          borderColor: '#f44336',
+          backgroundColor: 'rgba(244,67,54,0.08)',
+          yAxisID: 'y1',
+          tension: 0.08,
+          pointRadius: 3,
+          order: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+          y: {
+            type: 'linear',
+            beginAtZero: true,
+            title: { display: true, text: 'Jumlah' }
+          },
+          y1: {
+            type: 'linear',
+            beginAtZero: true,
+            position: 'right',
+            min: 0,
+            max: 100,
+            grid: { drawOnChartArea: false },
+            title: { display: true, text: 'Kumulatif (%)' },
+            ticks: { callback: function(value) { return value + "%"; } }
+          }
+        }
+      }
+    });
+    // Diagram Batang Bagian Penyebab
+    const bpLabels = ['Bagian A', 'Bagian B', 'Bagian C'];
+    const bpValues = [3, 2, 2];
+    new Chart(document.getElementById('batangBagianPenyebab'), {
+      type: 'bar',
+      data: {
+        labels: bpLabels,
+        datasets: [{
+          label: 'Jumlah DPTS',
+          data: bpValues,
+          backgroundColor: '#43a047',
+          borderColor: '#388e3c',
+          borderWidth: 1,
+          maxBarThickness: 70,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            title: { display: true, text: 'Bagian Penyebab' },
+            ticks: { color: '#222', font: { size: 14 } }
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Jumlah DPTS' }
+          }
+        }
+      }
+    });
+
+    // Tab switching logic
+    function showTab(tab) {
+      document.getElementById('dashboardTab').style.display = tab === 'dashboard' ? '' : 'none';
+      document.getElementById('pengecekanTab').style.display = tab === 'pengecekan' ? '' : 'none';
+      document.getElementById('produkTab').style.display = tab === 'produk' ? '' : 'none';
+      document.getElementById('dptsTab').style.display = tab === 'dpts' ? '' : 'none';
+      // Update nav-tabs active class
+      var navLinks = document.querySelectorAll('#mainTabs .nav-link');
+      navLinks.forEach(function(link) {
+        link.classList.remove('active');
+        if (link.textContent.trim().toLowerCase().includes(tab)) link.classList.add('active');
+      });
+      // Update navbar active class
+      var navbarLinks = document.querySelectorAll('.navbar-custom .btn');
+      navbarLinks.forEach(function(link) {
+        link.classList.remove('active');
+        if (link.textContent.trim().toLowerCase().includes(tab)) link.classList.add('active');
+      });
+    }
+  </script>
+</body>
+</html>
